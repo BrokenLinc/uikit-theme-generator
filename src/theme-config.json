@@ -1,0 +1,8 @@
+{
+  "variables": {
+    "@primary-color" : "#3456ff",
+    "@button-background-color" : "@primary-color",
+    "@button-text-color" : "white",
+    "@hook-button-rules" : "{}"
+  }
+}
