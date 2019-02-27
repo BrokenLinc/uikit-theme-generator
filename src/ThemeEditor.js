@@ -3,7 +3,8 @@ import { compose, withHandlers, withPropsOnChange, withState } from 'recompose';
 import { map, startsWith } from 'lodash';
 import Textarea from 'react-textarea-autosize';
 
-import themeConfig from "./theme-config";
+import themeConfig from './theme-config';
+import { Consumer } from './FirebaseAuthContext';
 
 const ThemeEditor = compose(
   withPropsOnChange([], () => ({
@@ -25,8 +26,27 @@ const ThemeEditor = compose(
   }),
 )(({ error, handleVariableChange, variables, windowId }) => (
   <div className="uk-flex app-panes">
-    <div className="uk-flex-none uk-light uk-background-secondary uk-padding-small uk-width-medium">
-      <div className="uk-form-stacked">
+    <div id="main-menu" data-uk-offcanvas="mode: push; overlay: true">
+      <button className="uk-offcanvas-close" type="button" data-uk-close></button>
+      <div className="uk-offcanvas-bar">
+        <h4>UIkit Theme Generator</h4>
+        <Consumer>
+          {auth => {console.log(auth); return !!auth.user ? (
+            <button className="uk-button uk-button-primary" type="button" onClick={auth.signOut}>Log out</button>
+            ) : (
+            <button className="uk-button uk-button-primary" type="button" onClick={auth.signIn}>
+              Log in with Google
+            </button>
+          )}}
+        </Consumer>
+      </div>
+    </div>
+
+    <div className="uk-flex-none uk-background-secondary uk-padding-small uk-width-medium">
+      <ul className="uk-iconnav">
+        <li><a href="" uk-icon="icon: menu" uk-toggle="target: #main-menu"></a></li>
+      </ul>
+      <div className="uk-form-stacked uk-light">
         {map(variables, (value, key) => (
           <div key={key}>
             <label className="uk-form-label">{key}</label>
