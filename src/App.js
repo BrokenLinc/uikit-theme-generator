@@ -1,71 +1,85 @@
-import React from 'react';
-import { map, startsWith } from 'lodash';
-import { compose, withHandlers, withPropsOnChange, withState } from 'recompose';
-import Textarea from 'react-textarea-autosize';
+import React, { Component } from 'react'
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect
+} from 'react-router-dom'
+import AuthProvider, { Consumer } from './FirebaseAuthContext'
+import ThemeEditor from './ThemeEditor';
 
-
-import themeConfig from './theme-config';
-
-const ThemeEditor = compose(
-  withPropsOnChange([], () => ({
-    variables: {...themeConfig.variables}
-  })),
-  withState('error', 'setError'),
-  withHandlers({
-    handleVariableChange: ({ setError, variables, windowId }) => (event) => {
-      // console.log(event.target.id, event.target.value);
-      variables[event.target.id] = event.target.value;
-      window[windowId].contentWindow.less.modifyVars(variables)
-        .then(() => {
-          setError();
-        },(error) => {
-          setError(error.message);
-          // console.log(error);
-        });
-    },
-  }),
-)(({ error, handleVariableChange, variables, windowId }) => (
-  <div className="uk-flex app-panes">
-    <div className="uk-flex-none uk-light uk-background-secondary uk-padding-small uk-width-medium">
-      <div className="uk-form-stacked">
-        {map(variables, (value, key) => (
-          <div key={key}>
-            <label className="uk-form-label">{key}</label>
-            <div className="uk-form-controls">
-              {startsWith(key, '@hook-') ? (
-                <Textarea
-                  style={{ minHeight: 30 /* not good enough */ }}
-                  className="uk-textarea uk-form-small uk-margin-small-bottom resize-none"
-                  id={key}
-                  defaultValue={value}
-                  onChange={handleVariableChange}
+class App extends Component {
+  render() {
+    return (
+      <AuthProvider>
+        <Consumer>
+          {auth => (
+            <Router>
+              <main>
+                <Header {...auth} />
+                <Route exact path="/" component={() => <div>Home</div>} />
+                <Route path="/public" component={() => <div>Public</div>} />
+                <Route
+                  path="/login"
+                  component={() =>
+                    !!auth.user ? (
+                      <Redirect to="/private" />
+                    ) : (
+                      <button onClick={auth.signIn}>Log In</button>
+                    )
+                  }
                 />
-              ) : (
-                <input
-                  className="uk-input uk-form-small uk-margin-small-bottom"
-                  id={key}
-                  defaultValue={value}
-                  onChange={handleVariableChange}
+                <PrivateRoute
+                  auth={auth}
+                  path="/private"
+                  component={ThemeEditor}
                 />
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-    <iframe className="uk-flex-1" id={windowId} title="Theme Window" src="components.html" />
-    <div className="uk-dark uk-position-bottom-right">
-      {error ? (
-        <div className="uk-label uk-label-danger">{error}</div>
-      ) : (
-        <div className="uk-label uk-label-success">No problems</div>
+              </main>
+            </Router>
+          )}
+        </Consumer>
+      </AuthProvider>
+    )
+  }
+};
+
+const Header = ({ user, signOut }) => {
+  return (
+    <ul>
+      <li>
+        <Link to="/">Home</Link>
+      </li>
+      <li>
+        <Link to="/public">Public</Link>
+      </li>
+      <li>
+        <Link to="/private">Private</Link>
+      </li>
+      {!!user && (
+        <li>
+          <button onClick={signOut}>Log Out</button>
+        </li>
       )}
-    </div>
-  </div>
-));
+    </ul>
+  )
+};
 
-const App = () => (
-  <ThemeEditor windowId="themeWindow" />
+const PrivateRoute = ({ component: Component, auth: { user }, ...rest }) => (
+  <Route
+    {...rest}
+    render={props =>
+      !!user ? (
+        <Component user={user} {...props} />
+      ) : (
+        <Redirect
+          to={{
+            pathname: '/login',
+            state: { from: props.location }
+          }}
+        />
+      )
+    }
+  />
 );
 
 export default App;
