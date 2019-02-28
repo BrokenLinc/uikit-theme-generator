@@ -1,28 +1,9 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { compose, withHandlers, withPropsOnChange, withState } from 'recompose';
 import { map, startsWith } from 'lodash';
 import Textarea from 'react-textarea-autosize';
-import { FirestoreCollection } from 'react-firestore';
-import { Link } from 'react-router-dom';
 
 import themeConfig from './theme-config';
-import { Consumer } from './FirebaseAuthContext';
-
-const renderThemesList = ({ isLoading, data }) => {
-  return isLoading ? (
-    <div>loading...</div>
-  ) : (
-    <ul>
-      {data.map(theme => (
-        <li key={theme.id}>
-          <Link to={`/${theme.id}`}>
-            {theme.name}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-};
 
 const ThemeEditor = compose(
   withPropsOnChange([], () => ({
@@ -44,37 +25,10 @@ const ThemeEditor = compose(
   }),
 )(({ error, handleVariableChange, variables, windowId }) => (
   <div className="uk-flex app-panes">
-    <div id="main-menu" data-uk-offcanvas="mode: push; overlay: true">
-      <button className="uk-offcanvas-close" type="button" data-uk-close></button>
-      <div className="uk-offcanvas-bar">
-        <h4>UIkit Theme Generator</h4>
-        <Consumer>
-          {auth => !!auth.user ? (
-            <Fragment>
-              {console.log(auth.user.uid)}
-              <FirestoreCollection
-                path="themes"
-                filter={['uid', '==', auth.user.uid]}
-                render={renderThemesList}
-              />
-              {/*<p>Logged in as {auth.user.displayName}</p>*/}
-              <p>{auth.user.email}</p>
-              {/*<p><img src={auth.user.photoURL} alt={auth.user.displayName} /></p>*/}
-              <p>{auth.user.uid}</p>
-              <button className="uk-button uk-button-primary" type="button" onClick={auth.signOut}>Log out</button>
-            </Fragment>
-            ) : (
-            <button className="uk-button uk-button-primary" type="button" onClick={auth.signIn}>
-              Log in with Google
-            </button>
-          )}
-        </Consumer>
-      </div>
-    </div>
 
     <div className="uk-flex-none uk-background-secondary uk-padding-small uk-width-medium">
       <ul className="uk-iconnav">
-        <li><a href="" uk-icon="icon: menu" uk-toggle="target: #main-menu"></a></li>
+        <li><a href="#" uk-icon="icon: menu" uk-toggle="target: #main-menu"></a></li>
       </ul>
       <div className="uk-form-stacked uk-light">
         {map(variables, (value, key) => (
