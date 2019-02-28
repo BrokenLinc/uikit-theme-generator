@@ -8461,6 +8461,13 @@ react-error-overlay@^5.1.3:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-5.1.3.tgz#16fcbde75ed4dc6161dc6dc959b48e92c6ffa9ad"
   integrity sha512-GoqeM3Xadie7XUApXOjkY3Qhs8RkwB/Za4WMedBGrOKH1eTuKGyoAECff7jiVonJchOx6KZ9i8ILO5XIoHB+Tg==
 
+react-firestore@^0.10.3:
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/react-firestore/-/react-firestore-0.10.3.tgz#85da2b8429fe1eac1d235a898f3f52383a17ea1c"
+  integrity sha512-e3Hud61fqAWcPYPIvfBLnnaGImk9ZvOhrCp4zpc2cAXV5Fuia3Mi+TDZ+fkdvGVtDZO73MYjCVK64raiXgu8Dw==
+  dependencies:
+    hoist-non-react-statics "^2.3.1"
+
 react-is@^16.8.1:
   version "16.8.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.1.tgz#a80141e246eb894824fb4f2901c0c50ef31d4cdb"

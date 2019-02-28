@@ -2,17 +2,6 @@ import React, { Component } from 'react'
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-// Initialize Firebase
-var config = {
-  apiKey: "AIzaSyA0BNF6OqbNpBtEsLbamaN0BL7sP3Y84nQ",
-  authDomain: "uikit-theme-generator.firebaseapp.com",
-  databaseURL: "https://uikit-theme-generator.firebaseio.com",
-  projectId: "uikit-theme-generator",
-  storageBucket: "uikit-theme-generator.appspot.com",
-  messagingSenderId: "288077087982"
-}
-
-firebase.initializeApp(config)
 const provider = new firebase.auth.GoogleAuthProvider()
 
 // Set default context state

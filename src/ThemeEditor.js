@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { compose, withHandlers, withPropsOnChange, withState } from 'recompose';
 import { map, startsWith } from 'lodash';
 import Textarea from 'react-textarea-autosize';
+import { FirestoreCollection } from 'react-firestore';
+import { Link } from 'react-router-dom';
 
 import themeConfig from './theme-config';
 import { Consumer } from './FirebaseAuthContext';
+
+const renderThemesList = ({ isLoading, data }) => {
+  return isLoading ? (
+    <div>loading...</div>
+  ) : (
+    <ul>
+      {data.map(theme => (
+        <li key={theme.id}>
+          <Link to={`/${theme.id}`}>
+            {theme.name}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const ThemeEditor = compose(
   withPropsOnChange([], () => ({
@@ -31,13 +49,25 @@ const ThemeEditor = compose(
       <div className="uk-offcanvas-bar">
         <h4>UIkit Theme Generator</h4>
         <Consumer>
-          {auth => {console.log(auth); return !!auth.user ? (
-            <button className="uk-button uk-button-primary" type="button" onClick={auth.signOut}>Log out</button>
+          {auth => !!auth.user ? (
+            <Fragment>
+              {console.log(auth.user.uid)}
+              <FirestoreCollection
+                path="themes"
+                filter={['uid', '==', auth.user.uid]}
+                render={renderThemesList}
+              />
+              {/*<p>Logged in as {auth.user.displayName}</p>*/}
+              <p>{auth.user.email}</p>
+              {/*<p><img src={auth.user.photoURL} alt={auth.user.displayName} /></p>*/}
+              <p>{auth.user.uid}</p>
+              <button className="uk-button uk-button-primary" type="button" onClick={auth.signOut}>Log out</button>
+            </Fragment>
             ) : (
             <button className="uk-button uk-button-primary" type="button" onClick={auth.signIn}>
               Log in with Google
             </button>
-          )}}
+          )}
         </Consumer>
       </div>
     </div>
