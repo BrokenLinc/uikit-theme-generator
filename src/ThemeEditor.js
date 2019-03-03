@@ -1,41 +1,19 @@
 import React, { Fragment } from 'react';
 import { compose, lifecycle, withHandlers, withPropsOnChange, withState } from 'recompose';
-import { clone, each, find, map, startsWith } from 'lodash';
+import { find, map, startsWith } from 'lodash';
 import Textarea from 'react-textarea-autosize';
 import { FirestoreCollection, withFirestore } from 'react-firestore';
 import cn from 'classnames';
 
-import themeConfig from './theme-config';
+import themeDefaults from './themeDefaults';
+import flattenVariables from './flattenVariables';
+import mergeVariables from './mergeVariables';
 import withLoadingSpinner from './withLoadingSpinner';
-
-const mergeVariables = (defaultVariables = [], userVariables = []) => {
-  const variables = {};
-  each(defaultVariables, (variable) => {
-    variables[variable.name] = clone(variable);
-  });
-  each(userVariables, (variable) => {
-    // console.log(variable);
-    variables[variable.name] = {
-      ...variables[variable.name],
-      ...variable,
-      isCustom: !variables[variable.name],
-    };
-  });
-  return variables;
-};
-
-const flattenVariables = (variables) => {
-  const result = {};
-  each(variables, ({ name, value }) => {
-    result[name] = value;
-  });
-  return result;
-};
 
 const ThemeVariablesEditor = compose(
   withLoadingSpinner,
   withPropsOnChange(['data'], ({ data }) => ({
-    variables: mergeVariables(themeConfig.variables, data),
+    variables: mergeVariables(themeDefaults.variables, data),
   })),
   withFirestore,
   lifecycle({
