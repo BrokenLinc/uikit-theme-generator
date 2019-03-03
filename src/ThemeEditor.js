@@ -38,9 +38,12 @@ const ThemeVariablesEditor = compose(
         .then(() => {
           onError();
           const existingVariable = find(variables, { name });
-          if (existingVariable) {
+          // console.log(!!existingVariable);
+          if (existingVariable.id) {
             // console.log(`themes/${themeId}/variables/${existingVariable.id}`);
             firestore.doc(`themes/${themeId}/variables/${existingVariable.id}`).update({ value });
+          } else {
+            firestore.collection(`themes/${themeId}/variables`).doc(name).set({ name, value });
           }
         },(error) => {
           onError(error.message);
@@ -93,7 +96,7 @@ const ThemeEditor = compose(
     <FirestoreCollection
       path={`themes/${themeId}/variables`}
       render={({ isLoading, data}) => (
-        <div className="uk-flex app-panes">
+        <div className="uk-flex app-panes" uk-height-viewport="offset-top: true">
 
           <div className="uk-flex-none uk-background-secondary uk-padding-small uk-width-medium">
             {/*<ul className="uk-iconnav uk-margin-bottom">*/}

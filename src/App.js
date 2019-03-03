@@ -8,6 +8,7 @@ import 'firebase/firestore';
 import { FirestoreProvider } from 'react-firestore';
 
 import AuthProvider from './FirebaseAuthContext';
+import MainMenu from './MainMenu';
 import Home from './Home';
 import ThemeEditor from './ThemeEditor';
 
@@ -21,6 +22,7 @@ class App extends Component {
         <AuthProvider>
           <Router>
             <main>
+              <MainMenu />
               <Route
                 exact
                 path="/"
