@@ -71,6 +71,7 @@ const ThemeVariablesEditor = compose(
             ) : (
               <div className="uk-position-relative uk-margin-small-bottom">
                 {isCustom && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: trash" type="button"></button>}
+                {isChanged && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: refresh" type="button"></button>}
                 <input
                   className={cn('uk-input', 'uk-form-small', { 'uk-form-success': isChanged })}
                   id={name}
