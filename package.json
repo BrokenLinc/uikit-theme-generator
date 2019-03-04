@@ -21,7 +21,8 @@
     "start": "craco start",
     "build": "craco build",
     "test": "craco test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build-config": "node build-config.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -31,5 +32,11 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "chalk": "^2.4.2",
+    "fs-extra": "^7.0.1",
+    "path": "^0.12.7",
+    "yargs": "^13.2.1"
+  }
 }
