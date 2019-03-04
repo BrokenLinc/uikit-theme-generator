@@ -6,11 +6,16 @@ const mergeVariables = (defaultVariables = [], userVariables = []) => {
     variables[variable.name] = clone(variable);
   });
   each(userVariables, (variable) => {
+    const defaultVariable = variables[variable.name];
+    const isCustom = !defaultVariable;
+    const isChanged = isCustom || (defaultVariable.value != variable.value);
+    // console.log(isChanged);
     // console.log(variable);
     variables[variable.name] = {
-      ...variables[variable.name],
+      ...defaultVariable,
       ...variable,
-      isCustom: !variables[variable.name],
+      isCustom,
+      isChanged,
     };
   });
   return variables;

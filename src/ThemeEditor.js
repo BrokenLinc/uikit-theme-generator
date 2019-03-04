@@ -55,7 +55,7 @@ const ThemeVariablesEditor = compose(
   // console.log(variables);
   return (
     <Fragment>
-      {map(variables, ({ isCustom, name, value }, key) => (
+      {map(variables, ({ isChanged, isCustom, name, value }, key) => (
         <div key={key}>
           <label className="uk-form-label">{ name }</label>
           <div className="uk-form-controls">
@@ -72,7 +72,7 @@ const ThemeVariablesEditor = compose(
               <div className="uk-position-relative uk-margin-small-bottom">
                 {isCustom && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: trash" type="button"></button>}
                 <input
-                  className="uk-input uk-form-small"
+                  className={cn('uk-input', 'uk-form-small', { 'uk-form-success': isChanged })}
                   id={name}
                   defaultValue={value}
                   onChange={handleVariableChange}
@@ -98,14 +98,14 @@ const ThemeEditor = compose(
       render={({ isLoading, data}) => (
         <div className="uk-flex app-panes">
 
-          <div className="uk-flex-none uk-background-secondary uk-padding-small uk-width-large">
+          <div className="uk-flex-none uk-background-muted uk-padding-small uk-width-large">
             {/*<ul className="uk-iconnav uk-margin-bottom">*/}
             {/*<li><a href="#" uk-icon="icon: menu"></a></li>*/}
             {/*<li><a href="#" uk-icon="icon: menu"></a></li>*/}
             {/*<li><a href="#" uk-icon="icon: menu"></a></li>*/}
             {/*<li><a href="#" uk-icon="icon: menu"></a></li>*/}
             {/*</ul>*/}
-            <div className="uk-form-stacked uk-light">
+            <div className="uk-form-stacked">
               <ThemeVariablesEditor
                 onError={setError}
                 windowId={windowId}

@@ -22,7 +22,7 @@ const ThemeList = withLoadingSpinner(({ data }) => (
 const Home = () => (
   <Consumer>
     {(auth) => (
-      <div className="uk-navbar-container uk-light uk-navbar-transparent uk-background-primary" data-uk-navbar>
+      <div className="uk-navbar-container uk-light uk-navbar-transparent uk-background-secondary" data-uk-navbar>
         <div className="uk-navbar-left">
           <Link to="/" className="uk-navbar-item uk-logo">UIkit Theme Generator</Link>
         </div>
