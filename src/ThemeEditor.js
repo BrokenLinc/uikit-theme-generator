@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { compose, lifecycle, withHandlers, withPropsOnChange, withState } from 'recompose';
-import { cloneDeep, each, filter, find, map, startsWith } from 'lodash';
+import { cloneDeep, each, filter, find, map, remove, startsWith } from 'lodash';
 import Textarea from 'react-textarea-autosize';
 import { FirestoreCollection, withFirestore } from 'react-firestore';
 import cn from 'classnames';
@@ -142,7 +142,8 @@ const ThemeVariablesEditor = compose(
     handleVariableChange: ({ firestore, onError, themeId, variables, windowId }) => (event) => {
       // console.log(firestore);
       const { id: name, value } = event.target;
-      find(variables, { name: name }).value = value;
+      // find(variables, { name }).value = value;
+      variables[name].value = value;
       // console.log(name, value);
       // variables[name] = value;
       window[windowId].contentWindow.less.modifyVars(flattenVariables(variables))
@@ -161,8 +162,16 @@ const ThemeVariablesEditor = compose(
           // console.log(error);
         });
     },
+    handleVariableDelete: ({ themeId, firestore, variables, windowId }) => (id) => {
+      // console.log(variables);
+      delete variables[id];
+      document.getElementById(id).value = find(themeDefaults.variables, { name: id }).value;
+      // remove(variables, { id });
+      window[windowId].contentWindow.less.modifyVars(flattenVariables(variables));
+      firestore.doc(`themes/${themeId}/variables/${id}`).delete();
+    },
   }),
-)(({ categories, isLoading, data, handleVariableChange }) => {
+)(({ categories, isLoading, data, handleVariableChange, handleVariableDelete }) => {
   // console.log(variables);
   return (
     <ul data-uk-accordion>
@@ -177,7 +186,7 @@ const ThemeVariablesEditor = compose(
                     <span className="uk-text-bold uk-text-small">{ name }</span>
                   </a>
                   <div className="uk-accordion-content">
-                    {map(variables, ({ isChanged, isCustom, name, value }, key) => (
+                    {map(variables, ({ isChanged, isCustom, name, value, id }, key) => (
                       <div key={key} className="uk-form-stacked">
                         <label className="uk-form-label">{ name }</label>
                         <div className="uk-form-controls">
@@ -192,8 +201,8 @@ const ThemeVariablesEditor = compose(
                             </div>
                           ) : (
                             <div className="uk-position-relative uk-margin-small-bottom">
-                              {isCustom && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: trash" type="button"></button>}
-                              {isChanged && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: refresh" type="button"></button>}
+                              {isCustom && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: trash" onClick={() => handleVariableDelete(id)} type="button"></button>}
+                              {isChanged && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: refresh" onClick={() => handleVariableDelete(id)} type="button"></button>}
                               <input
                                 className={cn('uk-input', 'uk-form-small', { 'uk-form-success': isChanged })}
                                 id={name}
