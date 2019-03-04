@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { compose, lifecycle, withHandlers, withPropsOnChange, withState } from 'recompose';
-import { each, find, map, startsWith } from 'lodash';
+import { cloneDeep, each, filter, find, map, startsWith } from 'lodash';
 import Textarea from 'react-textarea-autosize';
 import { FirestoreCollection, withFirestore } from 'react-firestore';
 import cn from 'classnames';
@@ -10,17 +10,48 @@ import flattenVariables from './flattenVariables';
 import mergeVariables from './mergeVariables';
 import withLoadingSpinner from './withLoadingSpinner';
 
-const categoryNames = [
-  'button-large',
-  'button-small',
-  'button-link',
-  'button-text',
-  'button-danger',
-  'button-secondary',
-  'button-primary',
-  'button-default',
-  'button',
+const CATEGORIES = [
+  { name: 'global' },
+
+  { name: 'breakpoint' },
+
+  { name: 'alert' },
+  { name: 'alert-close', parent: 'alert' },
+  { name: 'alert-primary', parent: 'alert' },
+  { name: 'alert-success', parent: 'alert' },
+  { name: 'alert-warning', parent: 'alert' },
+  { name: 'alert-danger', parent: 'alert' },
+
+  { name: 'button' },
+  { name: 'button-default', parent: 'button' },
+  { name: 'button-primary', parent: 'button' },
+  { name: 'button-secondary', parent: 'button' },
+  { name: 'button-danger', parent: 'button' },
+  { name: 'button-text', parent: 'button' },
+  { name: 'button-link', parent: 'button' },
+  { name: 'button-small', parent: 'button' },
+  { name: 'button-large', parent: 'button' },
+  { name: 'button-disabled', parent: 'button' },
 ];
+each(CATEGORIES, (category) => {
+  category.variables = [];
+  if (category.parent) {
+    const parent = find(CATEGORIES, {name: category.parent});
+    if (!parent.categories) {
+      parent.categories = [];
+    }
+    parent.categories.push(category);
+  } else {
+    if (!category.categories) {
+      category.categories = [];
+    }
+    category.categories.push({
+      name: 'base',
+      variables: category.variables,
+    });
+  }
+});
+CATEGORIES.reverse();
 
 const ThemeVariablesEditor = compose(
   withLoadingSpinner,
@@ -28,10 +59,7 @@ const ThemeVariablesEditor = compose(
     variables: mergeVariables(themeDefaults.variables, data),
   })),
   withPropsOnChange(['variables'], ({ variables }) => {
-    const categories = map(categoryNames, (categoryName) => ({
-      name: categoryName,
-      variables: [],
-    }));
+    const categories = cloneDeep(CATEGORIES);
     each(variables, (variable) => {
       const category = find(categories, (category) => {
         return startsWith(variable.name, `@${category.name}`);
@@ -41,8 +69,14 @@ const ThemeVariablesEditor = compose(
       }
     });
     categories.reverse();
+    // console.log(categories);
+    each(categories, (category) => {
+      category.name = category.name.replace(`${category.parent}-`, '');
+    })
+    const filteredCategories = filter(categories, ({ parent }) => !parent);
+    // console.log(filteredCategories);
     return {
-      categories,
+      categories: filteredCategories,
     };
   }),
   withFirestore,
@@ -85,38 +119,49 @@ const ThemeVariablesEditor = compose(
   // console.log(variables);
   return (
     <ul data-uk-accordion>
-      {map(categories, ({ name, variables }) => (
-        <li>
+      {map(categories, ({ name, categories: subcategories }) => (
+        <li key={name}>
           <a className="uk-accordion-title" href="#">{ name }</a>
           <div className="uk-accordion-content">
-            {map(variables, ({ isChanged, isCustom, name, value }, key) => (
-              <div key={key} className="uk-form-stacked">
-                <label className="uk-form-label">{ name }</label>
-                <div className="uk-form-controls">
-                  {startsWith(name, '@hook-') ? (
-                    <div className="uk-margin-small-bottom">
-                <Textarea
-                  className="uk-textarea uk-form-small resize-none"
-                  id={name}
-                  defaultValue={value}
-                  onChange={handleVariableChange}
-                />
-                    </div>
-                  ) : (
-                    <div className="uk-position-relative uk-margin-small-bottom">
-                      {isCustom && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: trash" type="button"></button>}
-                      {isChanged && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: refresh" type="button"></button>}
-                      <input
-                        className={cn('uk-input', 'uk-form-small', { 'uk-form-success': isChanged })}
-                        id={name}
-                        defaultValue={value}
-                        onChange={handleVariableChange}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+            <ul data-uk-accordion>
+              {map(subcategories, ({ name, variables }) => (
+                <li key={name} className="uk-margin-remove">
+                  <a className="uk-accordion-title" href="#">
+                    <span className="uk-text-bold uk-text-small">{ name }</span>
+                  </a>
+                  <div className="uk-accordion-content">
+                    {map(variables, ({ isChanged, isCustom, name, value }, key) => (
+                      <div key={key} className="uk-form-stacked">
+                        <label className="uk-form-label">{ name }</label>
+                        <div className="uk-form-controls">
+                          {startsWith(name, '@hook-') ? (
+                            <div className="uk-margin-small-bottom">
+                        <Textarea
+                          className="uk-textarea uk-form-small resize-none"
+                          id={name}
+                          defaultValue={value}
+                          onChange={handleVariableChange}
+                        />
+                            </div>
+                          ) : (
+                            <div className="uk-position-relative uk-margin-small-bottom">
+                              {isCustom && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: trash" type="button"></button>}
+                              {isChanged && <button className="uk-form-icon uk-form-icon-flip" uk-icon="icon: refresh" type="button"></button>}
+                              <input
+                                className={cn('uk-input', 'uk-form-small', { 'uk-form-success': isChanged })}
+                                id={name}
+                                defaultValue={value}
+                                onChange={handleVariableChange}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </li>
       ))}
