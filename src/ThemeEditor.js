@@ -96,9 +96,9 @@ const ThemeEditor = compose(
     <FirestoreCollection
       path={`themes/${themeId}/variables`}
       render={({ isLoading, data}) => (
-        <div className="uk-flex app-panes" uk-height-viewport="offset-top: true">
+        <div className="uk-flex app-panes">
 
-          <div className="uk-flex-none uk-background-secondary uk-padding-small uk-width-medium">
+          <div className="uk-flex-none uk-background-secondary uk-padding-small uk-width-large">
             {/*<ul className="uk-iconnav uk-margin-bottom">*/}
             {/*<li><a href="#" uk-icon="icon: menu"></a></li>*/}
             {/*<li><a href="#" uk-icon="icon: menu"></a></li>*/}
