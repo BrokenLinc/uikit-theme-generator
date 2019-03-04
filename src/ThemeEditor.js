@@ -10,10 +10,9 @@ import flattenVariables from './flattenVariables';
 import mergeVariables from './mergeVariables';
 import withLoadingSpinner from './withLoadingSpinner';
 
-const CATEGORIES = [
+themeDefaults.categories = [
   { name: 'global' },
-
-  { name: 'breakpoint' },
+  { name: 'breakpoint', parent: 'global' },
 
   { name: 'alert' },
   { name: 'alert-close', parent: 'alert' },
@@ -32,11 +31,59 @@ const CATEGORIES = [
   { name: 'button-small', parent: 'button' },
   { name: 'button-large', parent: 'button' },
   { name: 'button-disabled', parent: 'button' },
+
+  { name: 'description-list' },
+  { name: 'description-list-divider', parent: 'description-list' },
+
+  { name: 'divider' },
+  { name: 'divider-icon', parent: 'divider' },
+  { name: 'divider-small', parent: 'divider' },
+  { name: 'divider-vertical', parent: 'divider' },
+
+  { name: 'heading' },
+  { name: 'heading-primary', parent: 'heading' },
+  { name: 'heading-hero', parent: 'heading' },
+  { name: 'heading-divider', parent: 'heading' },
+  { name: 'heading-bullet', parent: 'heading' },
+  { name: 'heading-line', parent: 'heading' },
+
+  { name: 'icon' },
+  { name: 'icon-link', parent: 'icon' },
+  { name: 'icon-button', parent: 'icon' },
+
+  { name: 'link' },
+
+  { name: 'list' },
+  { name: 'list-divider', parent: 'list' },
+  { name: 'list-striped', parent: 'list' },
+  { name: 'list-bullet', parent: 'list' },
+  { name: 'list-large', parent: 'list' },
+
+  { name: 'form' },
+  { name: 'form-disabled', parent: 'form' },
+  { name: 'form-small', parent: 'form' },
+  { name: 'form-large', parent: 'form' },
+  { name: 'form-width', parent: 'form' },
+  { name: 'form-select', parent: 'form' },
+  { name: 'form-radio', parent: 'form' },
+  { name: 'form-icon', parent: 'form' },
+  { name: 'form-legend', parent: 'form' },
+  { name: 'form-horizontal', parent: 'form' },
+
+  { name: 'form-range' },
+
+  { name: 'table' },
+  { name: 'table-header', parent: 'table' },
+  { name: 'table-footer', parent: 'table' },
+  { name: 'table-divider', parent: 'table' },
+  { name: 'table-small', parent: 'table' },
+  { name: 'table-large', parent: 'table' },
 ];
-each(CATEGORIES, (category) => {
+
+each(themeDefaults.categories, (category) => {
   category.variables = [];
   if (category.parent) {
-    const parent = find(CATEGORIES, {name: category.parent});
+    const parent = find(themeDefaults.categories, {name: category.parent});
     if (!parent.categories) {
       parent.categories = [];
     }
@@ -51,7 +98,7 @@ each(CATEGORIES, (category) => {
     });
   }
 });
-CATEGORIES.reverse();
+themeDefaults.categories.reverse();
 
 const ThemeVariablesEditor = compose(
   withLoadingSpinner,
@@ -59,7 +106,7 @@ const ThemeVariablesEditor = compose(
     variables: mergeVariables(themeDefaults.variables, data),
   })),
   withPropsOnChange(['variables'], ({ variables }) => {
-    const categories = cloneDeep(CATEGORIES);
+    const categories = cloneDeep(themeDefaults.categories);
     each(variables, (variable) => {
       const category = find(categories, (category) => {
         return startsWith(variable.name, `@${category.name}`);
